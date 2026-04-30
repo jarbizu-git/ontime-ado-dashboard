@@ -545,7 +545,7 @@ def main():
 
     print("Generando HTML...")
     html = build_html(projects, stats, unplanned, mentions)
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "index.html")
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "index.html")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         f.write(html)
