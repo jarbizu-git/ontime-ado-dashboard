@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Azure DevOps — OntimeCorporate</title>
+<style>
+  :root {
+    --bg:#0f172a; --surface:#1e293b; --surface2:#334155;
+    --text:#f1f5f9; --muted:#94a3b8; --accent:#6366f1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+  header{padding:20px 32px;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  header h1{font-size:1.3rem;font-weight:700} header h1 span{color:var(--accent)}
+  .meta{color:var(--muted);font-size:.82rem}
+  .summary{display:flex;gap:16px;padding:16px 32px;flex-wrap:wrap}
+  .stat{background:var(--surface);border-radius:10px;padding:14px 20px;flex:1;min-width:120px}
+  .stat .num{font-size:1.8rem;font-weight:700;color:var(--accent)}
+  .stat.warn .num{color:#f59e0b}
+  .stat .lbl{color:var(--muted);font-size:.8rem;margin-top:2px}
+  /* tabs */
+  .tabs{display:flex;gap:4px;padding:0 32px;margin-bottom:16px;border-bottom:1px solid var(--surface2)}
+  .tab{padding:10px 18px;cursor:pointer;font-size:.9rem;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab-content{display:none} .tab-content.active{display:block}
+  /* filter bar */
+  .filter-bar{padding:0 32px 14px;display:flex;gap:8px;flex-wrap:wrap}
+  .filter-bar input{background:var(--surface);border:1px solid var(--surface2);color:var(--text);padding:7px 13px;border-radius:8px;font-size:.88rem;width:240px;outline:none}
+  .filter-bar input:focus{border-color:var(--accent)}
+  .btn-filter{background:var(--surface);border:1px solid var(--surface2);color:var(--muted);padding:7px 13px;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .15s}
+  .btn-filter:hover,.btn-filter.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* overview grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;padding:0 32px 32px}
+  .card{background:var(--surface);border-radius:12px;padding:16px;border:1px solid transparent;transition:transform .15s,border-color .15s}
+  .card:hover{transform:translateY(-2px);border-color:var(--surface2)}
+  .card.hot{border-left:3px solid #10b981} .card.warm{border-left:3px solid #f59e0b}
+  .card.cool{border-left:3px solid #6366f1} .card.cold{border-left:3px solid #475569}
+  .card-header{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+  .card-header h3{font-size:.92rem;font-weight:600;flex:1;line-height:1.3}
+  .ts{color:var(--muted);font-size:.76rem;white-space:nowrap}
+  .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .activity-dot.hot{background:#10b981;box-shadow:0 0 6px #10b981}
+  .activity-dot.warm{background:#f59e0b} .activity-dot.cool{background:#6366f1} .activity-dot.cold{background:#475569}
+  .desc{color:var(--muted);font-size:.78rem;margin-bottom:9px;line-height:1.5}
+  .bar-wrap{height:7px;border-radius:4px;overflow:hidden;background:var(--surface2);display:flex;margin-bottom:10px}
+  .bar-seg{height:100%}
+  .pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+  .pill{font-size:.73rem;padding:2px 7px;border-radius:99px;font-weight:500}
+  .card-footer{display:flex;align-items:center;justify-content:space-between}
+  .total-lbl{color:var(--muted);font-size:.78rem} .total-lbl b{color:var(--text)}
+  .unp-badge{font-size:.72rem;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;padding:2px 7px;border-radius:99px}
+  .no-data{color:var(--muted);font-size:.78rem}
+  .hidden{display:none!important}
+  /* unplanned tab */
+  .unp-list{padding:0 32px 32px;display:flex;flex-direction:column;gap:12px}
+  .unp-row{background:var(--surface);border-radius:12px;padding:16px;border-left:3px solid #f59e0b}
+  .unp-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .unp-name{font-weight:600;font-size:.95rem;flex:1}
+  .unp-count{font-size:1.3rem;font-weight:700;color:#f59e0b}
+  .unp-sub{font-size:.75rem;font-weight:400;color:var(--muted)}
+  .unp-pct{font-size:.8rem;color:var(--muted)}
+  .unp-bar-wrap{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:10px}
+  .unp-bar{height:100%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:3px}
+  .unp-detail{display:flex;flex-direction:column;gap:4px}
+  .unp-total-summary{background:var(--surface);border-radius:10px;padding:14px 20px;margin:0 32px 16px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .unp-total-summary .big{font-size:2rem;font-weight:700;color:#f59e0b}
+  .unp-total-summary .lbl{color:var(--muted);font-size:.85rem}
+  /* mentions tab */
+  .mention-list{padding:0 32px 32px;display:flex;flex-direction:column;gap:10px}
+  .mention-section-title{padding:0 32px;margin-bottom:10px;font-size:.85rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .mention-row{background:var(--surface);border-radius:10px;padding:14px 16px;border-left:3px solid var(--accent);transition:border-color .15s}
+  .mention-row[data-state="closed"],.mention-row[data-state="removed"],.mention-row[data-state="done"],.mention-row[data-state="resolved"]{border-left-color:#475569;opacity:.7}
+  .mention-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .mention-type{font-size:.72rem;background:#6366f122;color:#a5b4fc;border:1px solid #6366f144;padding:1px 7px;border-radius:99px;white-space:nowrap}
+  .mention-title{color:var(--text);text-decoration:none;font-size:.9rem;font-weight:600;flex:1;min-width:0}
+  .mention-title:hover{color:var(--accent)}
+  .mention-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-bottom:6px}
+  .mention-project{color:#94a3b8}
+  .mention-hl{font-size:.8rem;color:var(--muted);background:var(--surface2);padding:6px 10px;border-radius:6px;line-height:1.5}
+  .mention-hl mark{background:#f59e0b33;color:#fcd34d;padding:0 2px;border-radius:2px}
+  .hit-label{color:var(--accent);font-weight:600}
+  .hit-text{color:var(--muted)}
+  .mention-summary{background:var(--surface);border-radius:10px;padding:14px 20px;margin:0 32px 16px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .mention-summary .big{font-size:2rem;font-weight:700;color:var(--accent)}
+  .mention-summary .big.warn{color:#f59e0b}
+  .mention-summary .lbl{color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>Azure DevOps — <span>OntimeCorporate</span></h1>
+  <span class="meta">Actualizado: 30/04/2026 15:40</span>
+</header>
+<div class="summary">
+  <div class="stat"><div class="num">28</div><div class="lbl">Proyectos</div></div>
+  <div class="stat"><div class="num">20,903</div><div class="lbl">Work Items totales</div></div>
+  <div class="stat warn"><div class="num">1,975</div><div class="lbl">Sin planificación (activos)</div></div>
+  <div class="stat"><div class="num">3</div><div class="lbl">Activos esta semana</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(this,'overview')">Vista general</div>
+  <div class="tab" onclick="switchTab(this,'unplanned')">Sin planificación <span style="background:#f59e0b33;color:#f59e0b;padding:1px 7px;border-radius:99px;font-size:.75rem;margin-left:4px">1,975</span></div>
+  <div class="tab" onclick="switchTab(this,'mentions')">Menciones <span style="background:#6366f133;color:#a5b4fc;padding:1px 7px;border-radius:99px;font-size:.75rem;margin-left:4px">49</span></div>
+</div>
+
+<!-- TAB: Vista general -->
+<div id="tab-overview" class="tab-content active">
+  <div class="filter-bar">
+    <input type="text" id="search-overview" placeholder="Buscar proyecto..." oninput="filterOverview()">
+    <button class="btn-filter active" onclick="filterActivity(this,'all')">Todos</button>
+    <button class="btn-filter" onclick="filterActivity(this,'hot')">Esta semana</button>
+    <button class="btn-filter" onclick="filterActivity(this,'warm')">Este mes</button>
+    <button class="btn-filter" onclick="filterActivity(this,'cold')">Inactivos</button>
+  </div>
+  <div class="grid" id="grid">
+        <div class="card hot" data-name="business central">
+          <div class="card-header">
+            <span class="activity-dot hot"></span>
+            <h3>Business Central</h3>
+            <span class="ts">Hoy</span>
+          </div>
+          <p class="desc">Extensiones de Business Central de forma general para todos los tenants.
+IMPORTANTE: Si no es para Ontime Corporate, com…</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:33.3%;background:#8b5cf6" title="Test: 6"></div><div class="bar-seg" style="width:27.8%;background:#f59e0b" title="Doing: 5"></div><div class="bar-seg" style="width:22.2%;background:#6366f1" title="New: 4"></div><div class="bar-seg" style="width:11.1%;background:#3b82f6" title="Active: 2"></div><div class="bar-seg" style="width:5.6%;background:#6b7280" title="Closed: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>6</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>5</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>4</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>2</b></span><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>18</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">3 sin sprint</span>
+          </div>
+        </div>
+        <div class="card hot" data-name="business central (sin sii de nunsys)">
+          <div class="card-header">
+            <span class="activity-dot hot"></span>
+            <h3>Business Central (Sin SII de NUNSYS)</h3>
+            <span class="ts">Hoy</span>
+          </div>
+          <p class="desc">Extensiones replicadas de Business Central (sin dependencia de la extensión de Advanced SII) que se utilizarán en todos …</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:33.3%;background:#3b82f6" title="Active: 1"></div><div class="bar-seg" style="width:33.3%;background:#94a3b8" title="Approval: 1"></div><div class="bar-seg" style="width:33.3%;background:#f59e0b" title="Doing: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>1</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>3</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">1 sin sprint</span>
+          </div>
+        </div>
+        <div class="card hot" data-name="oficina del dato">
+          <div class="card-header">
+            <span class="activity-dot hot"></span>
+            <h3>Oficina del Dato</h3>
+            <span class="ts">Hace 4d</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:71.9%;background:#6b7280" title="Closed: 2582"></div><div class="bar-seg" style="width:16.0%;background:#6366f1" title="New: 576"></div><div class="bar-seg" style="width:4.8%;background:#f59e0b" title="Doing: 173"></div><div class="bar-seg" style="width:2.5%;background:#10b981" title="Resolved: 89"></div><div class="bar-seg" style="width:1.4%;background:#475569" title="Removed: 50"></div><div class="bar-seg" style="width:1.3%;background:#3b82f6" title="Active: 48"></div><div class="bar-seg" style="width:1.3%;background:#8b5cf6" title="Test: 46"></div><div class="bar-seg" style="width:0.7%;background:#ef4444" title="Blocked: 26"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Design: 1"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>2582</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>576</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>173</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>89</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>50</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>48</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>46</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>26</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Design <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>3592</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">460 sin sprint</span>
+          </div>
+        </div>
+        <div class="card warm" data-name="sga hardis">
+          <div class="card-header">
+            <span class="activity-dot warm"></span>
+            <h3>SGA Hardis</h3>
+            <span class="ts">Hace 21d</span>
+          </div>
+          <p class="desc">Equipo de SGA Hardis</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:48.5%;background:#10b981" title="Resolved: 16"></div><div class="bar-seg" style="width:36.4%;background:#6366f1" title="New: 12"></div><div class="bar-seg" style="width:15.2%;background:#3b82f6" title="Active: 5"></div></div>
+          <div class="pills"><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>16</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>12</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>5</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>33</b> items</span>
+            
+          </div>
+        </div>
+        <div class="card cool" data-name="logística">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Logística</h3>
+            <span class="ts">Hace 1m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:34.3%;background:#6b7280" title="Closed: 168"></div><div class="bar-seg" style="width:21.2%;background:#6366f1" title="New: 104"></div><div class="bar-seg" style="width:13.9%;background:#8b5cf6" title="Test: 68"></div><div class="bar-seg" style="width:9.8%;background:#3b82f6" title="Active: 48"></div><div class="bar-seg" style="width:8.2%;background:#10b981" title="Resolved: 40"></div><div class="bar-seg" style="width:7.1%;background:#f59e0b" title="Doing: 35"></div><div class="bar-seg" style="width:3.1%;background:#475569" title="Removed: 15"></div><div class="bar-seg" style="width:2.4%;background:#ef4444" title="Blocked: 12"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>168</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>104</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>68</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>48</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>40</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>35</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>15</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>12</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>490</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">84 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="ftl">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>FTL</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          <p class="desc">Grupo desde el cual se gestionará todo lo de FTL</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:69.9%;background:#6b7280" title="Closed: 1648"></div><div class="bar-seg" style="width:11.2%;background:#6366f1" title="New: 263"></div><div class="bar-seg" style="width:6.2%;background:#8b5cf6" title="Test: 145"></div><div class="bar-seg" style="width:3.9%;background:#f59e0b" title="Doing: 92"></div><div class="bar-seg" style="width:3.9%;background:#10b981" title="Resolved: 91"></div><div class="bar-seg" style="width:2.8%;background:#ef4444" title="Blocked: 65"></div><div class="bar-seg" style="width:2.0%;background:#3b82f6" title="Active: 46"></div><div class="bar-seg" style="width:0.2%;background:#475569" title="Removed: 4"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Desestimada: 2"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1648</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>263</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>145</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>92</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>91</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>65</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>46</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>4</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>2</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>2356</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">44 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="integraciones">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Integraciones</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:70.7%;background:#6b7280" title="Closed: 522"></div><div class="bar-seg" style="width:6.6%;background:#475569" title="Removed: 49"></div><div class="bar-seg" style="width:6.1%;background:#f59e0b" title="Doing: 45"></div><div class="bar-seg" style="width:4.9%;background:#ef4444" title="Blocked: 36"></div><div class="bar-seg" style="width:3.5%;background:#8b5cf6" title="Test: 26"></div><div class="bar-seg" style="width:3.3%;background:#10b981" title="Resolved: 24"></div><div class="bar-seg" style="width:3.1%;background:#6366f1" title="New: 23"></div><div class="bar-seg" style="width:1.6%;background:#3b82f6" title="Active: 12"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>522</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>49</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>45</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>36</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>26</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>24</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>23</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>12</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>738</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">67 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="integración de empresas">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Integración de Empresas</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:75.5%;background:#6366f1" title="New: 40"></div><div class="bar-seg" style="width:24.5%;background:#3b82f6" title="Active: 13"></div></div>
+          <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>40</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>13</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>53</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">53 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="ulm">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>ULM</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          <p class="desc">XS</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:54.5%;background:#6b7280" title="Closed: 116"></div><div class="bar-seg" style="width:16.4%;background:#10b981" title="Resolved: 35"></div><div class="bar-seg" style="width:9.4%;background:#3b82f6" title="Active: 20"></div><div class="bar-seg" style="width:8.0%;background:#6366f1" title="New: 17"></div><div class="bar-seg" style="width:4.2%;background:#475569" title="Removed: 9"></div><div class="bar-seg" style="width:3.8%;background:#f59e0b" title="Doing: 8"></div><div class="bar-seg" style="width:2.3%;background:#8b5cf6" title="Test: 5"></div><div class="bar-seg" style="width:1.4%;background:#ef4444" title="Blocked: 3"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>116</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>35</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>20</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>17</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>9</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>5</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>3</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>213</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">53 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="soporte it">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Soporte IT</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:100.0%;background:#475569" title="Removed: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>1</b> items</span>
+            
+          </div>
+        </div>
+        <div class="card cool" data-name="sistemas">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Sistemas</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:46.9%;background:#6b7280" title="Closed: 45"></div><div class="bar-seg" style="width:33.3%;background:#f59e0b" title="Doing: 32"></div><div class="bar-seg" style="width:8.3%;background:#6366f1" title="New: 8"></div><div class="bar-seg" style="width:5.2%;background:#475569" title="Removed: 5"></div><div class="bar-seg" style="width:5.2%;background:#10b981" title="Resolved: 5"></div><div class="bar-seg" style="width:1.0%;background:#ef4444" title="Blocked: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>45</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>32</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>8</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>5</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>5</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>96</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">8 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="rrhh">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>RRHH</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:40.9%;background:#6366f1" title="New: 18"></div><div class="bar-seg" style="width:22.7%;background:#3b82f6" title="Active: 10"></div><div class="bar-seg" style="width:15.9%;background:#6b7280" title="Closed: 7"></div><div class="bar-seg" style="width:11.4%;background:#10b981" title="Resolved: 5"></div><div class="bar-seg" style="width:9.1%;background:#f59e0b" title="Doing: 4"></div></div>
+          <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>18</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>10</b></span><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>7</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>5</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>4</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>44</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">31 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="pyp">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>PyP</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          <p class="desc">XL/XP</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:76.1%;background:#6b7280" title="Closed: 150"></div><div class="bar-seg" style="width:12.7%;background:#475569" title="Removed: 25"></div><div class="bar-seg" style="width:3.0%;background:#6366f1" title="New: 6"></div><div class="bar-seg" style="width:2.5%;background:#94a3b8" title="Desestimada: 5"></div><div class="bar-seg" style="width:2.0%;background:#3b82f6" title="Active: 4"></div><div class="bar-seg" style="width:2.0%;background:#f59e0b" title="Doing: 4"></div><div class="bar-seg" style="width:1.0%;background:#8b5cf6" title="Test: 2"></div><div class="bar-seg" style="width:0.5%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>150</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>25</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>6</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>5</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>4</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>4</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>197</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">10 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="portal ontime">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Portal Ontime</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:65.0%;background:#6b7280" title="Closed: 1013"></div><div class="bar-seg" style="width:15.1%;background:#8b5cf6" title="Test: 236"></div><div class="bar-seg" style="width:7.0%;background:#f59e0b" title="Doing: 109"></div><div class="bar-seg" style="width:5.0%;background:#6366f1" title="New: 78"></div><div class="bar-seg" style="width:3.2%;background:#10b981" title="Resolved: 50"></div><div class="bar-seg" style="width:2.0%;background:#3b82f6" title="Active: 31"></div><div class="bar-seg" style="width:1.5%;background:#475569" title="Removed: 23"></div><div class="bar-seg" style="width:1.2%;background:#ef4444" title="Blocked: 18"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="En curso: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1013</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>236</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>109</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>78</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>50</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>31</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>23</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>18</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">En curso <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>1559</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">170 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="comercial (atc)">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Comercial (ATC)</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:51.1%;background:#6b7280" title="Closed: 145"></div><div class="bar-seg" style="width:19.7%;background:#10b981" title="Resolved: 56"></div><div class="bar-seg" style="width:9.2%;background:#6366f1" title="New: 26"></div><div class="bar-seg" style="width:7.7%;background:#f59e0b" title="Doing: 22"></div><div class="bar-seg" style="width:7.7%;background:#8b5cf6" title="Test: 22"></div><div class="bar-seg" style="width:1.8%;background:#3b82f6" title="Active: 5"></div><div class="bar-seg" style="width:1.4%;background:#475569" title="Removed: 4"></div><div class="bar-seg" style="width:1.1%;background:#ef4444" title="Blocked: 3"></div><div class="bar-seg" style="width:0.4%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>145</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>56</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>26</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>22</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>22</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>5</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>4</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>284</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">38 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="clientes">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Clientes</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          <p class="desc">Nuevo Portal Clientes
+
+https://clientes.ontime.es</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:69.8%;background:#6b7280" title="Closed: 296"></div><div class="bar-seg" style="width:7.8%;background:#8b5cf6" title="Test: 33"></div><div class="bar-seg" style="width:7.5%;background:#ef4444" title="Blocked: 32"></div><div class="bar-seg" style="width:6.1%;background:#f59e0b" title="Doing: 26"></div><div class="bar-seg" style="width:6.1%;background:#6366f1" title="New: 26"></div><div class="bar-seg" style="width:1.7%;background:#475569" title="Removed: 7"></div><div class="bar-seg" style="width:0.9%;background:#3b82f6" title="Active: 4"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>296</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>33</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>32</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>26</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>26</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>7</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>4</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>424</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">35 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="ciberseguridad">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Ciberseguridad</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><span class="no-data">Sin work items</span></div>
+          <div class="pills"><span class="no-data">—</span></div>
+          <div class="card-footer">
+            <span class="total-lbl"></span>
+            
+          </div>
+        </div>
+        <div class="card cool" data-name="área de trabajo financiero">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Área de Trabajo Financiero</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:100.0%;background:#6366f1" title="New: 2"></div></div>
+          <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>2</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>2</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">2 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cool" data-name="automatización">
+          <div class="card-header">
+            <span class="activity-dot cool"></span>
+            <h3>Automatización</h3>
+            <span class="ts">Hace 2m</span>
+          </div>
+          <p class="desc">RPA</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:65.1%;background:#6b7280" title="Closed: 1202"></div><div class="bar-seg" style="width:16.9%;background:#10b981" title="Resolved: 311"></div><div class="bar-seg" style="width:7.0%;background:#ef4444" title="Blocked: 129"></div><div class="bar-seg" style="width:3.2%;background:#8b5cf6" title="Test: 59"></div><div class="bar-seg" style="width:2.6%;background:#6366f1" title="New: 48"></div><div class="bar-seg" style="width:2.0%;background:#f59e0b" title="Doing: 36"></div><div class="bar-seg" style="width:1.7%;background:#3b82f6" title="Active: 32"></div><div class="bar-seg" style="width:1.4%;background:#475569" title="Removed: 26"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Desestimada: 1"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1202</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>311</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>129</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>59</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>48</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>36</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>32</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>26</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>1845</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">5 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="prueba_arq_anl">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Prueba_Arq_ANL</h3>
+            <span class="ts">Hace 6m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:60.0%;background:#3b82f6" title="Active: 3"></div><div class="bar-seg" style="width:40.0%;background:#6366f1" title="New: 2"></div></div>
+          <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>3</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>2</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>5</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">1 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="portfproduct_pruebaanl">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>PortfProduct_PruebaANL</h3>
+            <span class="ts">Hace 6m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:50.0%;background:#3b82f6" title="Active: 1"></div><div class="bar-seg" style="width:50.0%;background:#6366f1" title="New: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>2</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">1 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="prueba_anl">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Prueba_ANL</h3>
+            <span class="ts">Hace 6m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:82.4%;background:#6b7280" title="Closed: 14"></div><div class="bar-seg" style="width:17.6%;background:#3b82f6" title="Active: 3"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>14</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>3</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>17</b> items</span>
+            
+          </div>
+        </div>
+        <div class="card cold" data-name="arquitectura">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Arquitectura</h3>
+            <span class="ts">Hace 6m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:88.3%;background:#6b7280" title="Closed: 1644"></div><div class="bar-seg" style="width:3.7%;background:#6366f1" title="New: 69"></div><div class="bar-seg" style="width:2.2%;background:#10b981" title="Resolved: 41"></div><div class="bar-seg" style="width:2.0%;background:#94a3b8" title="Desestimada: 38"></div><div class="bar-seg" style="width:1.7%;background:#f59e0b" title="Doing: 31"></div><div class="bar-seg" style="width:0.9%;background:#8b5cf6" title="Test: 17"></div><div class="bar-seg" style="width:0.4%;background:#3b82f6" title="Active: 7"></div><div class="bar-seg" style="width:0.4%;background:#ef4444" title="Blocked: 7"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Bloqueado: 3"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Pte Valoración: 3"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1644</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>69</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>41</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>38</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>31</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>17</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>7</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>7</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Bloqueado <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>1861</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">100 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="ssgg">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>SSGG</h3>
+            <span class="ts">Hace 9m</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:89.2%;background:#6b7280" title="Closed: 3093"></div><div class="bar-seg" style="width:4.4%;background:#6366f1" title="New: 154"></div><div class="bar-seg" style="width:2.4%;background:#10b981" title="Resolved: 84"></div><div class="bar-seg" style="width:1.9%;background:#475569" title="Removed: 66"></div><div class="bar-seg" style="width:1.0%;background:#8b5cf6" title="Test: 33"></div><div class="bar-seg" style="width:0.7%;background:#f59e0b" title="Doing: 25"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Desestimada: 8"></div><div class="bar-seg" style="width:0.2%;background:#ef4444" title="Blocked: 6"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>3093</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>154</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>84</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>66</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>33</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>25</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>6</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>3469</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">10 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="financiero">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Financiero</h3>
+            <span class="ts">Hace 1a</span>
+          </div>
+          <p class="desc">Grupo desde el que se organizará todo lo de Financiero</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:74.7%;background:#6b7280" title="Closed: 1746"></div><div class="bar-seg" style="width:8.9%;background:#6366f1" title="New: 208"></div><div class="bar-seg" style="width:7.2%;background:#8b5cf6" title="Test: 169"></div><div class="bar-seg" style="width:3.2%;background:#f59e0b" title="Doing: 74"></div><div class="bar-seg" style="width:2.8%;background:#475569" title="Removed: 66"></div><div class="bar-seg" style="width:1.7%;background:#ef4444" title="Blocked: 39"></div><div class="bar-seg" style="width:0.7%;background:#3b82f6" title="Active: 17"></div><div class="bar-seg" style="width:0.7%;background:#10b981" title="Resolved: 17"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1746</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>208</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>169</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>74</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>66</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>39</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>17</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>17</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>2336</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">272 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="iot">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>IoT</h3>
+            <span class="ts">Hace 1a</span>
+          </div>
+          <p class="desc">Grupo desde el que se gestionará todo lo de IoT</p>
+          <div class="bar-wrap"><span class="no-data">Sin work items</span></div>
+          <div class="pills"><span class="no-data">—</span></div>
+          <div class="card-footer">
+            <span class="total-lbl"></span>
+            
+          </div>
+        </div>
+        <div class="card cold" data-name="portfolio de productos">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Portfolio de Productos</h3>
+            <span class="ts">Hace 1a</span>
+          </div>
+          
+          <div class="bar-wrap"><div class="bar-seg" style="width:35.2%;background:#6b7280" title="Closed: 389"></div><div class="bar-seg" style="width:24.1%;background:#6366f1" title="New: 266"></div><div class="bar-seg" style="width:9.4%;background:#94a3b8" title="Estimate: 104"></div><div class="bar-seg" style="width:9.3%;background:#f59e0b" title="Doing: 103"></div><div class="bar-seg" style="width:6.8%;background:#475569" title="Removed: 75"></div><div class="bar-seg" style="width:5.7%;background:#10b981" title="Resolved: 63"></div><div class="bar-seg" style="width:3.1%;background:#3b82f6" title="Active: 34"></div><div class="bar-seg" style="width:2.7%;background:#94a3b8" title="Desestimada: 30"></div><div class="bar-seg" style="width:2.5%;background:#ef4444" title="Blocked: 28"></div><div class="bar-seg" style="width:0.5%;background:#94a3b8" title="Resuelto PTE Negocio: 5"></div><div class="bar-seg" style="width:0.3%;background:#94a3b8" title="Approval: 3"></div><div class="bar-seg" style="width:0.3%;background:#8b5cf6" title="Test: 3"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Pte Valoración: 2"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Aprobado: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>389</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>266</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>104</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>103</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>75</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>63</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>34</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>30</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>28</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Resuelto PTE Negocio <b>5</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>3</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Aprobado <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>1106</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">468 sin sprint</span>
+          </div>
+        </div>
+        <div class="card cold" data-name="registro de cambios ontime">
+          <div class="card-header">
+            <span class="activity-dot cold"></span>
+            <h3>Registro de Cambios Ontime</h3>
+            <span class="ts">Hace 1a</span>
+          </div>
+          <p class="desc">Proyecto para llevar a cabo el registro de cambios planificado como parte del proceso de Change Management</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:93.1%;background:#94a3b8" title="Cerrado: 148"></div><div class="bar-seg" style="width:3.8%;background:#94a3b8" title="Rechazado: 6"></div><div class="bar-seg" style="width:1.3%;background:#94a3b8" title="Aprobado: 2"></div><div class="bar-seg" style="width:1.3%;background:#94a3b8" title="Solicitado: 2"></div><div class="bar-seg" style="width:0.6%;background:#10b981" title="Resolved: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Cerrado <b>148</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Rechazado <b>6</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Aprobado <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Solicitado <b>2</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>159</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">59 sin sprint</span>
+          </div>
+        </div></div>
+</div>
+
+<!-- TAB: Sin planificación -->
+<div id="tab-unplanned" class="tab-content">
+  <div class="unp-total-summary">
+    <div><div class="big">1,975</div><div class="lbl">work items activos sin sprint en 23 proyectos</div></div>
+  </div>
+  <div class="filter-bar">
+    <input type="text" id="search-unplanned" placeholder="Buscar proyecto..." oninput="filterUnplanned()">
+  </div>
+  <div class="unp-list" id="unp-list">
+        <div class="unp-row" data-name="portfolio de productos">
+          <div class="unp-header">
+            <span class="unp-name">Portfolio de Productos</span>
+            <span class="unp-count">468 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">42% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:42.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>292</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Pequeño Desarrollo <b>90</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Evolutivo <b>46</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📋 Petición <b>21</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>9</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>6</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🐛 Bug <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>202</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>93</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>79</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>33</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>30</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>18</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Resuelto PTE Negocio <b>5</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>2</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Aprobado <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="oficina del dato">
+          <div class="unp-header">
+            <span class="unp-name">Oficina del Dato</span>
+            <span class="unp-count">460 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">13% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:12.8%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>321</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>88</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>35</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>7</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🐛 Bug <b>6</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📋 Petición <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🧪 Test Case <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>394</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>47</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>9</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>8</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Design <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="financiero">
+          <div class="unp-header">
+            <span class="unp-name">Financiero</span>
+            <span class="unp-count">272 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">12% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:11.6%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>128</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>106</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>22</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Evolutivo <b>10</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🐛 Bug <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Solicitud <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>161</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>55</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>27</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>23</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>6</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="portal ontime">
+          <div class="unp-header">
+            <span class="unp-name">Portal Ontime</span>
+            <span class="unp-count">170 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">11% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:10.9%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🐛 Bug <b>141</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>18</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>7</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Mantenimiento <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>129</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>16</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>12</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>11</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">En curso <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="arquitectura">
+          <div class="unp-header">
+            <span class="unp-name">Arquitectura</span>
+            <span class="unp-count">100 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">5% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:5.4%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>40</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📋 Petición <b>32</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>23</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Pequeño Desarrollo <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>54</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>27</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>6</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>3</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>2</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="logística">
+          <div class="unp-header">
+            <span class="unp-name">Logística</span>
+            <span class="unp-count">84 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">17% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:17.1%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>50</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>26</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>7</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Evolutivo <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>51</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>12</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>5</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="integraciones">
+          <div class="unp-header">
+            <span class="unp-name">Integraciones</span>
+            <span class="unp-count">67 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">9% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:9.1%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>35</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>21</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>11</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>19</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>16</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>16</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>8</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>8</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="registro de cambios ontime">
+          <div class="unp-header">
+            <span class="unp-name">Registro de Cambios Ontime</span>
+            <span class="unp-count">59 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">37% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:37.1%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Change Request <b>59</b></span></div>
+            <div class="pills"><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Cerrado <b>53</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Aprobado <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Rechazado <b>2</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Solicitado <b>2</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="integración de empresas">
+          <div class="unp-header">
+            <span class="unp-name">Integración de Empresas</span>
+            <span class="unp-count">53 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">100% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:100.0%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>25</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>23</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>4</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>40</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>13</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="ulm">
+          <div class="unp-header">
+            <span class="unp-name">ULM</span>
+            <span class="unp-count">53 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">25% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:24.9%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>25</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>22</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">🐛 Bug <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>3</b></span></div>
+            <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>20</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>17</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>5</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>3</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="ftl">
+          <div class="unp-header">
+            <span class="unp-name">FTL</span>
+            <span class="unp-count">44 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">2% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:1.9%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>20</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>14</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>9</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>27</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>12</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>4</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="comercial (atc)">
+          <div class="unp-header">
+            <span class="unp-name">Comercial (ATC)</span>
+            <span class="unp-count">38 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">13% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:13.4%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>33</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>23</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>3</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>2</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="clientes">
+          <div class="unp-header">
+            <span class="unp-name">Clientes</span>
+            <span class="unp-count">35 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">8% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:8.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>20</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>14</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>20</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>11</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>2</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>2</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="rrhh">
+          <div class="unp-header">
+            <span class="unp-name">RRHH</span>
+            <span class="unp-count">31 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">70% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:70.5%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>11</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>9</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>9</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>2</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>17</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>10</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>4</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="ssgg">
+          <div class="unp-header">
+            <span class="unp-name">SSGG</span>
+            <span class="unp-count">10 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">0% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:0.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>5</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>2</b></span></div>
+            <div class="pills"><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>5</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>4</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="pyp">
+          <div class="unp-header">
+            <span class="unp-name">PyP</span>
+            <span class="unp-count">10 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">5% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:5.1%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>7</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>3</b></span></div>
+            <div class="pills"><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>5</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>3</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="sistemas">
+          <div class="unp-header">
+            <span class="unp-name">Sistemas</span>
+            <span class="unp-count">8 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">8% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:8.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>3</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Petición Sistemas <b>2</b></span></div>
+            <div class="pills"><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>5</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>3</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="automatización">
+          <div class="unp-header">
+            <span class="unp-name">Automatización</span>
+            <span class="unp-count">5 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">0% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:0.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📋 Petición <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>3</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>1</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="business central">
+          <div class="unp-header">
+            <span class="unp-name">Business Central</span>
+            <span class="unp-count">3 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">17% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:16.7%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Evolutivo <b>3</b></span></div>
+            <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>1</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="área de trabajo financiero">
+          <div class="unp-header">
+            <span class="unp-name">Área de Trabajo Financiero</span>
+            <span class="unp-count">2 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">100% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:100.0%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>2</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>2</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="prueba_arq_anl">
+          <div class="unp-header">
+            <span class="unp-name">Prueba_Arq_ANL</span>
+            <span class="unp-count">1 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">20% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:20.0%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="portfproduct_pruebaanl">
+          <div class="unp-header">
+            <span class="unp-name">PortfProduct_PruebaANL</span>
+            <span class="unp-count">1 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">50% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:50.0%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>1</b></span></div>
+          </div>
+        </div>
+        <div class="unp-row" data-name="business central (sin sii de nunsys)">
+          <div class="unp-header">
+            <span class="unp-name">Business Central (Sin SII de NUNSYS)</span>
+            <span class="unp-count">1 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">33% del total</span>
+          </div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:33.3%"></div></div>
+          <div class="unp-detail">
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Evolutivo <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>1</b></span></div>
+          </div>
+        </div></div>
+</div>
+
+<!-- TAB: Menciones -->
+<div id="tab-mentions" class="tab-content">
+  <div class="mention-summary">
+    <div><div class="big">49</div><div class="lbl">menciones totales</div></div>
+    <div><div class="big warn">24</div><div class="lbl">en items activos</div></div>
+    <div><div class="big" style="color:#6b7280">25</div><div class="lbl">en items cerrados</div></div>
+  </div>
+  <div class="filter-bar">
+    <input type="text" id="search-mentions" placeholder="Buscar proyecto o título..." oninput="filterMentions()">
+    <button class="btn-filter active" onclick="filterMentionState(this,'all')">Todos</button>
+    <button class="btn-filter" onclick="filterMentionState(this,'active')">Activos</button>
+    <button class="btn-filter" onclick="filterMentionState(this,'closed')">Cerrados</button>
+  </div>
+  <p class="mention-section-title" id="mention-active-label">Activos (24)</p>
+  <div class="mention-list" id="mention-list-active">
+        <div class="mention-row" data-state="doing" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3695" target="_blank">#3695 CAU - RRHH</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 Ythais Orozco Moreno</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2025-03-10</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3715" target="_blank">#3715 Unificación de Tenants</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="comercial (atc)">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Comercial%20%28ATC%29/_workitems/edit/22801" target="_blank">#22801 SF Service Cloud</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Comercial (ATC)</span>
+            <span class="mention-assigned">👤 Samara Dakdouk Aissami</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-23</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/5566" target="_blank">#5566 Sistema de Gestión de Usuarios y Accesos</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Ythais Orozco Moreno</span>
+            <span class="mention-fields">🔍 en: Descripción</span>
+            <span class="mention-date">🕐 2026-03-24</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">• Creador de la solicitud :<mark>jarbizu@ontime.es</mark>
+• Tipo de proyecto :Nuevo proyecto o desarrollo
+• RPN : <mark>jarbizu@ontime.es</mark>
+• Departamento : RRHH
+• Área :
+• Aplicativo o sistema :Automatización de procesos</span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">• Creador de la solicitud :<mark>jarbizu@ontime.es</mark>
+• Tipo de proyecto :Nuevo proyecto o desarrollo
+• RPN : <mark>jarbizu@ontime.es</mark>
+• Departamento : RRHH
+• Área :
+• Aplicativo o sistema :Automatización de procesos</span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/23608" target="_blank">#23608 2026.[ACODB].ACODB como TMS</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Luciano Di Stefano</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-24</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/2764" target="_blank">#2764 Políticas de Seguridad</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a, Creado por</span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/2766" target="_blank">#2766 Cumplimiento normativo. Certificación ENS e ISO</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a, Creado por</span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/2767" target="_blank">#2767 Gobierno y gestión de ciberdefensa</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a, Creado por</span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/2768" target="_blank">#2768 Plan de continuidad de negocio</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a, Creado por</span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/32" target="_blank">#32 Migración de clientes al Portal de clientes Ontime </a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Jose Antonio Perez López</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="new" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/9661" target="_blank">#9661 Telefonia - Portabilidad Vodafone</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/4060" target="_blank">#4060 CYBER - Guías de bastionado</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/4069" target="_blank">#4069 CYBER - Vulnerabilidades</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/4071" target="_blank">#4071 Monitorización - Naudit</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/5402" target="_blank">#5402 Migración Destionalogistic > Ontime</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="doing" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/8136" target="_blank">#8136 Migracion CPD Marconi</a>
+            <span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55;flex-shrink:0">Doing</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="estimate" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/15769" target="_blank">#15769 [PPRX] Integraciones con clientes para las derivaciones en PPRX.</a>
+            <span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855;flex-shrink:0">Estimate</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Jose Antonio Perez López</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-03-30</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">@David Villar Pascual te lo dejo a ti pues es del equipo de Chus y falta la parte de woocommerce y resto de plugins, para el cliente que nos han dado para empezar es woocommerce y es necesario apretar</span></div>
+        </div>
+        <div class="mention-row" data-state="test" data-project="financiero">
+          <div class="mention-header">
+            <span class="mention-type">Task</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Financiero/_workitems/edit/21730" target="_blank">#21730 Carga masiva nuevos proveedores Portal</a>
+            <span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655;flex-shrink:0">Test</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Financiero</span>
+            <span class="mention-assigned">👤 Jose Juan Fernandez Trujillo</span>
+            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-date">🕐 2026-04-20</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">.
+• Correo interlocutor ROL Interlocutor OTRO ROL
+mmartinez@ontimelogistica.com SI
+servicioinstalaciones@ontime.es SI
+katia.reis@ontimelogistica.com NO
+compras@ontimelogistica.com SI
+atudela@ontime.es</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">@Jose Juan Fernandez Trujillo @Marino García Pérez @Hector Esono Alonso Comunico a negocio.</span></div>
+        </div>
+        <div class="mention-row" data-state="test" data-project="clientes">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Clientes/_workitems/edit/24288" target="_blank">#24288 VF Clientes - Informe diario con situación de los pedidos</a>
+            <span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655;flex-shrink:0">Test</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Clientes</span>
+            <span class="mention-assigned">👤 Marino García Pérez</span>
+            <span class="mention-fields">🔍 en: Descripción</span>
+            <span class="mention-date">🕐 2026-04-20</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="test" data-project="clientes">
+          <div class="mention-header">
+            <span class="mention-type">Task</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Clientes/_workitems/edit/23564" target="_blank">#23564 VF Clientes - Informe diario con situación de los pedidos</a>
+            <span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655;flex-shrink:0">Test</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Clientes</span>
+            <span class="mention-assigned">👤 Andrés Gil Pérez</span>
+            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-date">🕐 2026-04-20</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="test" data-project="arquitectura">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Arquitectura/_workitems/edit/24901" target="_blank">#24901 Desarrollo eapi-iam</a>
+            <span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655;flex-shrink:0">Test</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Arquitectura</span>
+            <span class="mention-assigned">👤 Ivan Roncero Martinez</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-04-28</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">DIS GRAFICO",
+"Fecha_inicio": "2024-02-19",
+"Equipos": [
+"DIRECCIÓN RELACIONES INSTITUCIONALES Y COMUNICACIÓN"
+],
+"Departamentos": [
+"DIRECCIÓN RELACIONES"
+]
+},
+{
+"Identificador_de_la_identidad": 2716</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">ACEITUNO DORDIO",
+"Número_de_empleado": "50819303K",
+"Correo_electrónico_corporativo": "eaceituno@ontime.es",
+"Responsable": 2716795,
+"Empresa": 298899,
+"Centro_de_coste": 449809,
+"Estado_de_actividad</span></div>
+        </div>
+        <div class="mention-row" data-state="test" data-project="arquitectura">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Arquitectura/_workitems/edit/24902" target="_blank">#24902 Desarrollo papi-iam</a>
+            <span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655;flex-shrink:0">Test</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Arquitectura</span>
+            <span class="mention-assigned">👤 Ivan Roncero Martinez</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-04-28</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">DIS GRAFICO",
+"Fecha_inicio": "2024-02-19",
+"Equipos": [
+"DIRECCIÓN RELACIONES INSTITUCIONALES Y COMUNICACIÓN"
+],
+"Departamentos": [
+"DIRECCIÓN RELACIONES"
+]
+},
+{
+"Identificador_de_la_identidad": 2716</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">ACEITUNO DORDIO",
+"Número_de_empleado": "50819303K",
+"Correo_electrónico_corporativo": "eaceituno@ontime.es",
+"Responsable": 2716795,
+"Empresa": 298899,
+"Centro_de_coste": 449809,
+"Estado_de_actividad</span></div>
+        </div>
+        <div class="mention-row" data-state="estimate" data-project="automatización">
+          <div class="mention-header">
+            <span class="mention-type">Pequeño Desarrollo</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Automatizaci%C3%B3n/_workitems/edit/25776" target="_blank">#25776 Formación Claude</a>
+            <span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855;flex-shrink:0">Estimate</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Automatización</span>
+            <span class="mention-assigned">👤 Victor Fernandez Casado</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-04-28</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="estimate" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/20792" target="_blank">#20792 App reetiquetado expediciones Padua</a>
+            <span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855;flex-shrink:0">Estimate</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Jose Antonio Perez López</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-04-28</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">@Jose Antonio Perez López @Mariana Contardi Fernandez tienes que ir estado a estado.</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">@Mariana Contardi Fernandez @Victor Fernandez Casado , no me deja, solo puedo ponerla en estimate</span></div>
+        </div></div>
+  <p class="mention-section-title" style="margin-top:8px" id="mention-closed-label">Cerrados / Resueltos (25)</p>
+  <div class="mention-list" id="mention-list-closed">
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3636" target="_blank">#3636 Proceso de contratación</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Ythais Orozco Moreno</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2025-03-10</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="arquitectura">
+          <div class="mention-header">
+            <span class="mention-type">Petición</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Arquitectura/_workitems/edit/6191" target="_blank">#6191 Ampliar destinatarios para notificaciones Oracle</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Arquitectura</span>
+            <span class="mention-assigned">👤 Victor Andradas Encabo</span>
+            <span class="mention-fields">🔍 en: Descripción</span>
+            <span class="mention-date">🕐 2026-01-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">Necesitamos que se añadan los siguientes destinatarios para recibir notificaciones de Oracle tales como las nuevas versiones de APEX:
+sfernandezb@ontime.es
+rgomez@ontimelogistica.com
+<mark>jarbizu@ontime.es</mark></span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">Necesitamos que se añadan los siguientes destinatarios para recibir notificaciones de Oracle tales como las nuevas versiones de APEX:
+sfernandezb@ontime.es
+rgomez@ontimelogistica.com
+<mark>jarbizu@ontime.es</mark></span></div>
+        </div>
+        <div class="mention-row" data-state="removed" data-project="automatización">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Automatizaci%C3%B3n/_workitems/edit/3677" target="_blank">#3677 [Alta de usuarios] Creación de flujos de tareas en el CAU. Alta de Usuarios</a>
+            <span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955;flex-shrink:0">Removed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Automatización</span>
+            <span class="mention-assigned">👤 Guillermo Alonso Sanchez</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-05</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3772" target="_blank">#3772 Propuesta de contrato</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3776" target="_blank">#3776 Negociación de contrato</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Julian Arbizu Crespo - Dtor. IT</span>
+            <span class="mention-fields">🔍 en: Asignado a</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Asignado a:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Evolutivo</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/39" target="_blank">#39 Teléfono de Urgencias de IT 24/7</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Jose Antonio Perez López</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="resolved" data-project="portal ontime">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portal%20Ontime/_workitems/edit/1298" target="_blank">#1298 Prueba Piloto</a>
+            <span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155;flex-shrink:0">Resolved</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portal Ontime</span>
+            <span class="mention-assigned">👤 Ruben Gómez Cabrera</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3781" target="_blank">#3781 Agrupación tasación recogida y SAD colaboradores</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Ruben Gómez Cabrera</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">@Jose Antonio Pérez he subido como adjunto el correo (.eml) donde Faustino indicaba que no se podía probar y dar por buena la agrupación por no haber recursos en el entorno de PRE, teniendo que dejarl</span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3704" target="_blank">#3704 CAU Implementación de formularios dotaciones</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3709" target="_blank">#3709 CAU Implementación formularios aplicaciones</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3710" target="_blank">#3710 CAU Implementación formularios comunicaciones</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3716" target="_blank">#3716 Unificación Tenant Ontime Acotral</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">User Story</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3717" target="_blank">#3717 Unificación Tenant Ontime Resto</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3702" target="_blank">#3702 CAU - Tecnología</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3714" target="_blank">#3714 Integración Tenants</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3703" target="_blank">#3703 CAU - Tecnología</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3719" target="_blank">#3719 Unificación líneas móviles</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Creado por</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="resolved" data-project="sistemas">
+          <div class="mention-header">
+            <span class="mention-type">Feature</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Sistemas/_workitems/edit/3722" target="_blank">#3722 Mercadona - CPD</a>
+            <span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155;flex-shrink:0">Resolved</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Sistemas</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3014" target="_blank">#3014 Migración CPD Antequera > Cloud</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">++ @_IT - Francisco Cobos @Diana Enache</span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3753" target="_blank">#3753 SDWAN - SAIWALL</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/4649" target="_blank">#4649 Gestion acceso privilegiado</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/8135" target="_blank">#8135 Sistemas AVD Portugal</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 _IT - Domingo Lima</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-02-13</span>
+          </div>
+          
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3762" target="_blank">#3762 Cyber - Despliegue Proofpoint</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-03-04</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">El usuario dlima@ontime.es ha intentado cambiar a estado Resolved sin tener todas las Features cerradas.</span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="portfolio de productos">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Portfolio%20de%20Productos/_workitems/edit/3751" target="_blank">#3751 SDWAN - FlexWAN</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Portfolio de Productos</span>
+            <span class="mention-assigned">👤 Domingo Lima - IT</span>
+            <span class="mention-fields">🔍 en: Comentario</span>
+            <span class="mention-date">🕐 2026-03-04</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">El usuario dlima@ontime.es ha intentado cambiar a estado Resolved sin tener todas las Features cerradas.</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">El usuario dlima@ontime.es ha intentado cambiar a estado Resolved sin tener todas las Features cerradas.</span></div>
+        </div>
+        <div class="mention-row" data-state="closed" data-project="financiero">
+          <div class="mention-header">
+            <span class="mention-type">Solicitud</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Financiero/_workitems/edit/21890" target="_blank">#21890 Valoración para integrar internamente ROL Interlocutor y Jurídico</a>
+            <span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055;flex-shrink:0">Closed</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Financiero</span>
+            <span class="mention-assigned">👤 Jose Juan Fernandez Trujillo</span>
+            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-date">🕐 2026-03-20</span>
+          </div>
+          <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">@Alex Ricardo Vasconez Acosta @Marino García Pérez tras analizarlo las conclusiones son:
+•No se pueden tener dos roles al mismo tiempo.</span> &nbsp;·&nbsp; <span class="hit-label">Comentario:</span> <span class="hit-text">@Alex Ricardo Vasconez Acosta podemos cerrar?</span></div>
+        </div></div>
+</div>
+
+<script>
+  let activeFilter = 'all';
+  let mentionFilter = 'all';
+
+  function switchTab(el, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+  }
+
+  function filterOverview() {
+    const q = document.getElementById('search-overview').value.toLowerCase();
+    document.querySelectorAll('#grid .card').forEach(c => {
+      const match = c.dataset.name.includes(q);
+      const matchAct = activeFilter === 'all' || c.classList.contains(activeFilter);
+      c.classList.toggle('hidden', !match || !matchAct);
+    });
+  }
+
+  function filterActivity(btn, filter) {
+    activeFilter = filter;
+    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterOverview();
+  }
+
+  function filterUnplanned() {
+    const q = document.getElementById('search-unplanned').value.toLowerCase();
+    document.querySelectorAll('#unp-list .unp-row').forEach(r => {
+      r.classList.toggle('hidden', !r.dataset.name.includes(q));
+    });
+  }
+
+  function filterMentions() {
+    const q = document.getElementById('search-mentions').value.toLowerCase();
+    document.querySelectorAll('.mention-row').forEach(r => {
+      const text = (r.dataset.project + ' ' + r.querySelector('.mention-title').textContent).toLowerCase();
+      const matchQ = text.includes(q);
+      const matchState = mentionFilter === 'all' ||
+        (mentionFilter === 'active' && !['closed','removed','done','resolved'].includes(r.dataset.state)) ||
+        (mentionFilter === 'closed' && ['closed','removed','done','resolved'].includes(r.dataset.state));
+      r.classList.toggle('hidden', !matchQ || !matchState);
+    });
+  }
+
+  function filterMentionState(btn, filter) {
+    mentionFilter = filter;
+    document.querySelectorAll('#tab-mentions .btn-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterMentions();
+  }
+</script>
+</body>
+</html>
