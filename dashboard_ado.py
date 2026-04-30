@@ -309,6 +309,7 @@ def build_html(projects, stats, unplanned, mentions):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Azure DevOps — OntimeCorporate</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
   :root {{
     --bg:#0f172a; --surface:#1e293b; --surface2:#334155;
@@ -504,6 +505,17 @@ def build_html(projects, stats, unplanned, mentions):
     document.querySelectorAll('#tab-mentions .btn-filter').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     filterMentions();
+  }}
+</script>
+<script>
+  // Netlify Identity — proteger el dashboard
+  if (window.netlifyIdentity) {{
+    window.netlifyIdentity.on('init', user => {{
+      if (!user) {{
+        window.netlifyIdentity.on('login', () => location.reload());
+        window.netlifyIdentity.open();
+      }}
+    }});
   }}
 </script>
 </body>
