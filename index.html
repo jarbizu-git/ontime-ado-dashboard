@@ -92,18 +92,18 @@
 <body>
 <header>
   <h1>Azure DevOps — <span>OntimeCorporate</span></h1>
-  <span class="meta">Actualizado: 03/06/2026 02:47</span>
+  <span class="meta">Actualizado: 03/06/2026 08:06</span>
 </header>
 <div class="summary">
   <div class="stat"><div class="num">25</div><div class="lbl">Proyectos</div></div>
-  <div class="stat"><div class="num">22,874</div><div class="lbl">Work Items totales</div></div>
-  <div class="stat warn"><div class="num">2,132</div><div class="lbl">Sin planificación (activos)</div></div>
-  <div class="stat"><div class="num">0</div><div class="lbl">Activos esta semana</div></div>
+  <div class="stat"><div class="num">22,893</div><div class="lbl">Work Items totales</div></div>
+  <div class="stat warn"><div class="num">2,136</div><div class="lbl">Sin planificación (activos)</div></div>
+  <div class="stat"><div class="num">1</div><div class="lbl">Activos esta semana</div></div>
 </div>
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab(this,'overview')">Vista general</div>
-  <div class="tab" onclick="switchTab(this,'unplanned')">Sin planificación <span style="background:#f59e0b33;color:#f59e0b;padding:1px 7px;border-radius:99px;font-size:.75rem;margin-left:4px">2,132</span></div>
+  <div class="tab" onclick="switchTab(this,'unplanned')">Sin planificación <span style="background:#f59e0b33;color:#f59e0b;padding:1px 7px;border-radius:99px;font-size:.75rem;margin-left:4px">2,136</span></div>
   <div class="tab" onclick="switchTab(this,'mentions')">Menciones <span style="background:#6366f133;color:#a5b4fc;padding:1px 7px;border-radius:99px;font-size:.75rem;margin-left:4px">52</span></div>
 </div>
 
@@ -117,6 +117,22 @@
     <button class="btn-filter" onclick="filterActivity(this,'cold')">Inactivos</button>
   </div>
   <div class="grid" id="grid">
+        <div class="card hot" data-name="clientes">
+          <div class="card-header">
+            <span class="activity-dot hot"></span>
+            <h3>Clientes</h3>
+            <span class="ts">Hoy</span>
+          </div>
+          <p class="desc">Nuevo Portal Clientes
+
+https://clientes.ontime.es</p>
+          <div class="bar-wrap"><div class="bar-seg" style="width:74.2%;background:#6b7280" title="Closed: 373"></div><div class="bar-seg" style="width:8.3%;background:#f59e0b" title="Doing: 42"></div><div class="bar-seg" style="width:6.8%;background:#6366f1" title="New: 34"></div><div class="bar-seg" style="width:4.8%;background:#ef4444" title="Blocked: 24"></div><div class="bar-seg" style="width:3.2%;background:#8b5cf6" title="Test: 16"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 9"></div><div class="bar-seg" style="width:0.8%;background:#3b82f6" title="Active: 4"></div><div class="bar-seg" style="width:0.2%;background:#10b981" title="Resolved: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>373</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>42</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>34</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>24</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>16</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>9</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>4</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>1</b></span></div>
+          <div class="card-footer">
+            <span class="total-lbl"><b>503</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">49 sin sprint</span>
+          </div>
+        </div>
         <div class="card cool" data-name="business central">
           <div class="card-header">
             <span class="activity-dot cool"></span>
@@ -153,10 +169,10 @@ IMPORTANTE: Si no es para Ontime Corporate, com…</p>
             <span class="ts">Hace 1m</span>
           </div>
           
-          <div class="bar-wrap"><div class="bar-seg" style="width:71.3%;background:#6b7280" title="Closed: 2844"></div><div class="bar-seg" style="width:15.5%;background:#6366f1" title="New: 619"></div><div class="bar-seg" style="width:4.9%;background:#f59e0b" title="Doing: 196"></div><div class="bar-seg" style="width:2.4%;background:#10b981" title="Resolved: 94"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 70"></div><div class="bar-seg" style="width:1.6%;background:#3b82f6" title="Active: 65"></div><div class="bar-seg" style="width:1.5%;background:#8b5cf6" title="Test: 59"></div><div class="bar-seg" style="width:0.9%;background:#ef4444" title="Blocked: 37"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Design: 1"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Estimate: 1"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>2844</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>619</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>196</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>94</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>70</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>65</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>59</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>37</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Design <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:71.5%;background:#6b7280" title="Closed: 2851"></div><div class="bar-seg" style="width:15.5%;background:#6366f1" title="New: 618"></div><div class="bar-seg" style="width:4.9%;background:#f59e0b" title="Doing: 197"></div><div class="bar-seg" style="width:2.4%;background:#10b981" title="Resolved: 94"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 70"></div><div class="bar-seg" style="width:1.6%;background:#3b82f6" title="Active: 65"></div><div class="bar-seg" style="width:1.3%;background:#8b5cf6" title="Test: 53"></div><div class="bar-seg" style="width:0.9%;background:#ef4444" title="Blocked: 37"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Design: 1"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Estimate: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>2851</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>618</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>197</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>94</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>70</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>65</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>53</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>37</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Design <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>1</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>3986</b> items</span>
+            <span class="total-lbl"><b>3987</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">455 sin sprint</span>
           </div>
         </div>
@@ -195,11 +211,11 @@ IMPORTANTE: Si no es para Ontime Corporate, com…</p>
             <span class="ts">Hace 3m</span>
           </div>
           <p class="desc">Grupo desde el cual se gestionará todo lo de FTL</p>
-          <div class="bar-wrap"><div class="bar-seg" style="width:74.3%;background:#6b7280" title="Closed: 2055"></div><div class="bar-seg" style="width:8.2%;background:#6366f1" title="New: 226"></div><div class="bar-seg" style="width:6.5%;background:#8b5cf6" title="Test: 181"></div><div class="bar-seg" style="width:4.4%;background:#f59e0b" title="Doing: 122"></div><div class="bar-seg" style="width:2.6%;background:#ef4444" title="Blocked: 72"></div><div class="bar-seg" style="width:1.8%;background:#3b82f6" title="Active: 50"></div><div class="bar-seg" style="width:1.7%;background:#10b981" title="Resolved: 48"></div><div class="bar-seg" style="width:0.3%;background:#475569" title="Removed: 8"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Desestimada: 2"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>2055</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>226</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>181</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>122</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>72</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>50</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>48</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>8</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>2</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:74.3%;background:#6b7280" title="Closed: 2061"></div><div class="bar-seg" style="width:8.3%;background:#6366f1" title="New: 229"></div><div class="bar-seg" style="width:6.6%;background:#8b5cf6" title="Test: 182"></div><div class="bar-seg" style="width:4.4%;background:#f59e0b" title="Doing: 121"></div><div class="bar-seg" style="width:2.6%;background:#ef4444" title="Blocked: 71"></div><div class="bar-seg" style="width:1.9%;background:#3b82f6" title="Active: 52"></div><div class="bar-seg" style="width:1.7%;background:#10b981" title="Resolved: 48"></div><div class="bar-seg" style="width:0.3%;background:#475569" title="Removed: 8"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Desestimada: 2"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>2061</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>229</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>182</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>121</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>71</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>52</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>48</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>8</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>2</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>2764</b> items</span>
-            <span class="unp-badge" title="Sin planificación (activos)">67 sin sprint</span>
+            <span class="total-lbl"><b>2774</b> items</span>
+            <span class="unp-badge" title="Sin planificación (activos)">71 sin sprint</span>
           </div>
         </div>
         <div class="card cold" data-name="integraciones">
@@ -307,10 +323,10 @@ IMPORTANTE: Si no es para Ontime Corporate, com…</p>
             <span class="ts">Hace 3m</span>
           </div>
           
-          <div class="bar-wrap"><div class="bar-seg" style="width:69.1%;background:#6b7280" title="Closed: 1125"></div><div class="bar-seg" style="width:12.5%;background:#8b5cf6" title="Test: 203"></div><div class="bar-seg" style="width:6.3%;background:#f59e0b" title="Doing: 102"></div><div class="bar-seg" style="width:5.2%;background:#6366f1" title="New: 84"></div><div class="bar-seg" style="width:2.5%;background:#10b981" title="Resolved: 41"></div><div class="bar-seg" style="width:1.8%;background:#ef4444" title="Blocked: 29"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 29"></div><div class="bar-seg" style="width:0.9%;background:#3b82f6" title="Active: 15"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="En curso: 1"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1125</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>203</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>102</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>84</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>41</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>29</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>29</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>15</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">En curso <b>1</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:69.2%;background:#6b7280" title="Closed: 1128"></div><div class="bar-seg" style="width:12.3%;background:#8b5cf6" title="Test: 201"></div><div class="bar-seg" style="width:6.3%;background:#f59e0b" title="Doing: 102"></div><div class="bar-seg" style="width:5.2%;background:#6366f1" title="New: 85"></div><div class="bar-seg" style="width:2.5%;background:#10b981" title="Resolved: 41"></div><div class="bar-seg" style="width:1.8%;background:#ef4444" title="Blocked: 29"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 29"></div><div class="bar-seg" style="width:0.9%;background:#3b82f6" title="Active: 15"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="En curso: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1128</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>201</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>102</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>85</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>41</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>29</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>29</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>15</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">En curso <b>1</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>1629</b> items</span>
+            <span class="total-lbl"><b>1631</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">182 sin sprint</span>
           </div>
         </div>
@@ -326,22 +342,6 @@ IMPORTANTE: Si no es para Ontime Corporate, com…</p>
           <div class="card-footer">
             <span class="total-lbl"><b>310</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">46 sin sprint</span>
-          </div>
-        </div>
-        <div class="card cold" data-name="clientes">
-          <div class="card-header">
-            <span class="activity-dot cold"></span>
-            <h3>Clientes</h3>
-            <span class="ts">Hace 3m</span>
-          </div>
-          <p class="desc">Nuevo Portal Clientes
-
-https://clientes.ontime.es</p>
-          <div class="bar-wrap"><div class="bar-seg" style="width:74.2%;background:#6b7280" title="Closed: 373"></div><div class="bar-seg" style="width:8.3%;background:#f59e0b" title="Doing: 42"></div><div class="bar-seg" style="width:6.8%;background:#6366f1" title="New: 34"></div><div class="bar-seg" style="width:4.8%;background:#ef4444" title="Blocked: 24"></div><div class="bar-seg" style="width:3.2%;background:#8b5cf6" title="Test: 16"></div><div class="bar-seg" style="width:1.8%;background:#475569" title="Removed: 9"></div><div class="bar-seg" style="width:0.8%;background:#3b82f6" title="Active: 4"></div><div class="bar-seg" style="width:0.2%;background:#10b981" title="Resolved: 1"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>373</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>42</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>34</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>24</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>16</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>9</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>4</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>1</b></span></div>
-          <div class="card-footer">
-            <span class="total-lbl"><b>503</b> items</span>
-            <span class="unp-badge" title="Sin planificación (activos)">49 sin sprint</span>
           </div>
         </div>
         <div class="card cold" data-name="ciberseguridad">
@@ -393,10 +393,10 @@ https://clientes.ontime.es</p>
             <span class="ts">Hace 7m</span>
           </div>
           
-          <div class="bar-wrap"><div class="bar-seg" style="width:87.7%;background:#6b7280" title="Closed: 1809"></div><div class="bar-seg" style="width:4.0%;background:#6366f1" title="New: 82"></div><div class="bar-seg" style="width:2.2%;background:#f59e0b" title="Doing: 46"></div><div class="bar-seg" style="width:1.9%;background:#10b981" title="Resolved: 39"></div><div class="bar-seg" style="width:1.8%;background:#94a3b8" title="Desestimada: 38"></div><div class="bar-seg" style="width:0.8%;background:#8b5cf6" title="Test: 17"></div><div class="bar-seg" style="width:0.5%;background:#ef4444" title="Blocked: 10"></div><div class="bar-seg" style="width:0.4%;background:#3b82f6" title="Active: 9"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Bloqueado: 5"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Pte Valoración: 5"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Estimate: 3"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1809</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>82</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>46</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>39</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>38</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>17</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>10</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>9</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Bloqueado <b>5</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>5</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>3</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:87.7%;background:#6b7280" title="Closed: 1812"></div><div class="bar-seg" style="width:4.1%;background:#6366f1" title="New: 85"></div><div class="bar-seg" style="width:2.0%;background:#f59e0b" title="Doing: 42"></div><div class="bar-seg" style="width:1.8%;background:#94a3b8" title="Desestimada: 38"></div><div class="bar-seg" style="width:1.8%;background:#10b981" title="Resolved: 37"></div><div class="bar-seg" style="width:1.0%;background:#8b5cf6" title="Test: 20"></div><div class="bar-seg" style="width:0.5%;background:#ef4444" title="Blocked: 10"></div><div class="bar-seg" style="width:0.4%;background:#3b82f6" title="Active: 9"></div><div class="bar-seg" style="width:0.3%;background:#94a3b8" title="Pte Valoración: 6"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Bloqueado: 4"></div><div class="bar-seg" style="width:0.1%;background:#94a3b8" title="Estimate: 3"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1812</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>85</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>42</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>38</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>37</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>20</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>10</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>9</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>6</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Bloqueado <b>4</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Estimate <b>3</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>2063</b> items</span>
+            <span class="total-lbl"><b>2066</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">98 sin sprint</span>
           </div>
         </div>
@@ -407,10 +407,10 @@ https://clientes.ontime.es</p>
             <span class="ts">Hace 10m</span>
           </div>
           
-          <div class="bar-wrap"><div class="bar-seg" style="width:89.2%;background:#6b7280" title="Closed: 3120"></div><div class="bar-seg" style="width:4.4%;background:#6366f1" title="New: 154"></div><div class="bar-seg" style="width:2.4%;background:#10b981" title="Resolved: 85"></div><div class="bar-seg" style="width:1.9%;background:#475569" title="Removed: 66"></div><div class="bar-seg" style="width:0.9%;background:#8b5cf6" title="Test: 33"></div><div class="bar-seg" style="width:0.7%;background:#f59e0b" title="Doing: 25"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Desestimada: 8"></div><div class="bar-seg" style="width:0.2%;background:#ef4444" title="Blocked: 6"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>3120</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>154</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>85</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>66</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>33</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>25</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>6</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:89.2%;background:#6b7280" title="Closed: 3121"></div><div class="bar-seg" style="width:4.4%;background:#6366f1" title="New: 154"></div><div class="bar-seg" style="width:2.4%;background:#10b981" title="Resolved: 85"></div><div class="bar-seg" style="width:1.9%;background:#475569" title="Removed: 66"></div><div class="bar-seg" style="width:0.9%;background:#8b5cf6" title="Test: 33"></div><div class="bar-seg" style="width:0.7%;background:#f59e0b" title="Doing: 26"></div><div class="bar-seg" style="width:0.2%;background:#94a3b8" title="Desestimada: 8"></div><div class="bar-seg" style="width:0.2%;background:#ef4444" title="Blocked: 6"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>3121</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>154</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>85</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>66</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>33</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>26</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>6</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>3497</b> items</span>
+            <span class="total-lbl"><b>3499</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">10 sin sprint</span>
           </div>
         </div>
@@ -421,10 +421,10 @@ https://clientes.ontime.es</p>
             <span class="ts">Hace 1a</span>
           </div>
           <p class="desc">Grupo desde el que se organizará todo lo de Financiero</p>
-          <div class="bar-wrap"><div class="bar-seg" style="width:76.1%;background:#6b7280" title="Closed: 1909"></div><div class="bar-seg" style="width:8.5%;background:#6366f1" title="New: 213"></div><div class="bar-seg" style="width:5.5%;background:#8b5cf6" title="Test: 139"></div><div class="bar-seg" style="width:3.7%;background:#f59e0b" title="Doing: 92"></div><div class="bar-seg" style="width:2.9%;background:#475569" title="Removed: 72"></div><div class="bar-seg" style="width:1.2%;background:#10b981" title="Resolved: 31"></div><div class="bar-seg" style="width:1.2%;background:#ef4444" title="Blocked: 29"></div><div class="bar-seg" style="width:0.8%;background:#3b82f6" title="Active: 21"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Approval: 1"></div></div>
-          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1909</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>213</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>139</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>92</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>72</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>31</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>29</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>21</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>1</b></span></div>
+          <div class="bar-wrap"><div class="bar-seg" style="width:76.1%;background:#6b7280" title="Closed: 1909"></div><div class="bar-seg" style="width:8.4%;background:#6366f1" title="New: 211"></div><div class="bar-seg" style="width:5.6%;background:#8b5cf6" title="Test: 140"></div><div class="bar-seg" style="width:3.7%;background:#f59e0b" title="Doing: 93"></div><div class="bar-seg" style="width:2.9%;background:#475569" title="Removed: 72"></div><div class="bar-seg" style="width:1.2%;background:#10b981" title="Resolved: 31"></div><div class="bar-seg" style="width:1.2%;background:#ef4444" title="Blocked: 29"></div><div class="bar-seg" style="width:0.9%;background:#3b82f6" title="Active: 22"></div><div class="bar-seg" style="width:0.0%;background:#94a3b8" title="Approval: 1"></div></div>
+          <div class="pills"><span class="pill" style="background:#6b728022;color:#6b7280;border:1px solid #6b728055">Closed <b>1909</b></span><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>211</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>140</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>93</b></span><span class="pill" style="background:#47556922;color:#475569;border:1px solid #47556955">Removed <b>72</b></span><span class="pill" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Resolved <b>31</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>29</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>22</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Approval <b>1</b></span></div>
           <div class="card-footer">
-            <span class="total-lbl"><b>2507</b> items</span>
+            <span class="total-lbl"><b>2508</b> items</span>
             <span class="unp-badge" title="Sin planificación (activos)">276 sin sprint</span>
           </div>
         </div>
@@ -475,7 +475,7 @@ https://clientes.ontime.es</p>
 <!-- TAB: Sin planificación -->
 <div id="tab-unplanned" class="tab-content">
   <div class="unp-total-summary">
-    <div><div class="big">2,132</div><div class="lbl">work items activos sin sprint en 21 proyectos</div></div>
+    <div><div class="big">2,136</div><div class="lbl">work items activos sin sprint en 21 proyectos</div></div>
   </div>
   <div class="filter-bar">
     <input type="text" id="search-unplanned" placeholder="Buscar proyecto..." oninput="filterUnplanned()">
@@ -547,7 +547,7 @@ https://clientes.ontime.es</p>
             <span class="unp-count">98 <span class="unp-sub">sin sprint</span></span>
             <span class="unp-pct">5% del total</span>
           </div>
-          <div class="unp-bar-wrap"><div class="unp-bar" style="width:4.8%"></div></div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:4.7%"></div></div>
           <div class="unp-detail">
             <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>39</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📋 Petición <b>33</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>21</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>2</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">• Pequeño Desarrollo <b>1</b></span></div>
             <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>52</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Desestimada <b>27</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>8</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>6</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Pte Valoración <b>3</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>1</b></span><span class="pill" style="background:#94a3b822;color:#94a3b8;border:1px solid #94a3b855">Bloqueado <b>1</b></span></div>
@@ -568,13 +568,13 @@ https://clientes.ontime.es</p>
         <div class="unp-row" data-name="ftl">
           <div class="unp-header">
             <span class="unp-name">FTL</span>
-            <span class="unp-count">67 <span class="unp-sub">sin sprint</span></span>
-            <span class="unp-pct">2% del total</span>
+            <span class="unp-count">71 <span class="unp-sub">sin sprint</span></span>
+            <span class="unp-pct">3% del total</span>
           </div>
-          <div class="unp-bar-wrap"><div class="unp-bar" style="width:2.4%"></div></div>
+          <div class="unp-bar-wrap"><div class="unp-bar" style="width:2.6%"></div></div>
           <div class="unp-detail">
-            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>30</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>21</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>15</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span></div>
-            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>25</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>24</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>13</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>4</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>1</b></span></div>
+            <div class="pills" style="margin-bottom:4px"><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">✓ Task <b>34</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">📖 User Story <b>21</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">★ Feature <b>15</b></span><span class="pill" style="background:#6366f122;color:#a5b4fc;border:1px solid #6366f155">⚡ Epic <b>1</b></span></div>
+            <div class="pills"><span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155">New <b>27</b></span><span class="pill" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55">Doing <b>24</b></span><span class="pill" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f655">Active <b>14</b></span><span class="pill" style="background:#ef444422;color:#ef4444;border:1px solid #ef444455">Blocked <b>4</b></span><span class="pill" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf655">Test <b>2</b></span></div>
           </div>
         </div>
         <div class="unp-row" data-name="integraciones">
@@ -778,20 +778,6 @@ https://clientes.ontime.es</p>
           </div>
           <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
         </div>
-        <div class="mention-row" data-state="new" data-project="comercial (atc)">
-          <div class="mention-header">
-            <span class="mention-type">Epic</span>
-            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Comercial%20%28ATC%29/_workitems/edit/22801" target="_blank">#22801 SF Service Cloud</a>
-            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
-          </div>
-          <div class="mention-meta">
-            <span class="mention-project">📁 Comercial (ATC)</span>
-            <span class="mention-assigned">👤 Samara Dakdouk Aissami</span>
-            <span class="mention-fields">🔍 en: </span>
-            <span class="mention-date">🕐 2026-03-23</span>
-          </div>
-          
-        </div>
         <div class="mention-row" data-state="doing" data-project="portfolio de productos">
           <div class="mention-header">
             <span class="mention-type">Epic</span>
@@ -941,7 +927,7 @@ https://clientes.ontime.es</p>
           <div class="mention-meta">
             <span class="mention-project">📁 Clientes</span>
             <span class="mention-assigned">👤 Marino García Pérez</span>
-            <span class="mention-fields">🔍 en: Creado por, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Creado por</span>
             <span class="mention-date">🕐 2026-05-25</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Creado por:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">Es necesario automatizar este informe para mandarlo por periodos mensuales (una vez vencido el mes) a los siguientes correos electrónicos: ontimefacturacion@ontime.es y fburgos@ontime.es</span></div>
@@ -955,7 +941,7 @@ https://clientes.ontime.es</p>
           <div class="mention-meta">
             <span class="mention-project">📁 Portfolio de Productos</span>
             <span class="mention-assigned">👤 Álvaro Novillo</span>
-            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Comentario</span>
             <span class="mention-date">🕐 2026-05-27</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">• Creador de la solicitud :<mark>jarbizu@ontime.es</mark>
@@ -988,7 +974,7 @@ https://clientes.ontime.es</p>
           <div class="mention-meta">
             <span class="mention-project">📁 Clientes</span>
             <span class="mention-assigned">👤 Andrés Gil Pérez</span>
-            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Comentario</span>
             <span class="mention-date">🕐 2026-06-01</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">Necesitamos crear un informe para los retornos y caducados de correos
@@ -1018,10 +1004,24 @@ https://clientes.ontime.es</p>
           <div class="mention-meta">
             <span class="mention-project">📁 Clientes</span>
             <span class="mention-assigned">👤 Andrés Gil Pérez</span>
-            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Comentario</span>
             <span class="mention-date">🕐 2026-06-02</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span> &nbsp;·&nbsp; <span class="hit-label">Descripción:</span> <span class="hit-text">IT <mark>jarbizu@ontime.es</mark>></span></div>
+        </div>
+        <div class="mention-row" data-state="new" data-project="comercial (atc)">
+          <div class="mention-header">
+            <span class="mention-type">Epic</span>
+            <a class="mention-title" href="https://dev.azure.com/OntimeCorporate/Comercial%20%28ATC%29/_workitems/edit/22801" target="_blank">#22801 SF Service Cloud</a>
+            <span class="pill" style="background:#6366f122;color:#6366f1;border:1px solid #6366f155;flex-shrink:0">New</span>
+          </div>
+          <div class="mention-meta">
+            <span class="mention-project">📁 Comercial (ATC)</span>
+            <span class="mention-assigned">👤 Samara Dakdouk Aissami</span>
+            <span class="mention-fields">🔍 en: </span>
+            <span class="mention-date">🕐 2026-06-02</span>
+          </div>
+          
         </div>
         <div class="mention-row" data-state="new" data-project="portfolio de productos">
           <div class="mention-header">
@@ -1390,7 +1390,7 @@ rgomez@ontimelogistica.com
           <div class="mention-meta">
             <span class="mention-project">📁 Financiero</span>
             <span class="mention-assigned">👤 Jose Juan Fernandez Trujillo</span>
-            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Comentario</span>
             <span class="mention-date">🕐 2026-03-20</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Comentario:</span> <span class="hit-text">@Alex Ricardo Vasconez Acosta @Marino García Pérez tras analizarlo las conclusiones son:
@@ -1405,7 +1405,7 @@ rgomez@ontimelogistica.com
           <div class="mention-meta">
             <span class="mention-project">📁 Financiero</span>
             <span class="mention-assigned">👤 Jose Juan Fernandez Trujillo</span>
-            <span class="mention-fields">🔍 en: Comentario, Descripción</span>
+            <span class="mention-fields">🔍 en: Descripción, Comentario</span>
             <span class="mention-date">🕐 2026-05-04</span>
           </div>
           <div class="mention-hl"><span class="hit-label">Descripción:</span> <span class="hit-text">.
